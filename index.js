@@ -31,6 +31,7 @@ io.on('connection', function(socket){
 
   socket.on('disconnect', function(){ 
     console.log("client id=" + socket.id + " disconnected"); 
+    connectedUsers = connectedUsers.filter(x => x.socketId !== socket.id); 
   });
 
   socket.on('user list', function(){
