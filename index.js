@@ -3,6 +3,15 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 1337;
 
+/*
+user {
+  profile: {
+    name : string,
+    tags : []
+  },
+  sockedId : string
+}
+ */
 var connectedUsers = []; 
 
 
@@ -25,13 +34,13 @@ io.on('connection', function(socket){
   });
 
   socket.on('user list', function(){
-    var data = connectedUsers.map(user => Object({name : user.profile.name, socketId : user.socketId}))
+    var data = getConnectedUsers()
     io.emit('user list', data)
   });
 
   socket.on('login', function(profile){
     connectedUsers.push({profile : profile, socketId : socket.id})
-    var data = connectedUsers.map(user => Object({name : user.profile.name, socketId : user.socketId}))
+    var data = getConnectedUsers()
     io.emit('user list', data)
   });
 });
@@ -39,3 +48,7 @@ io.on('connection', function(socket){
 http.listen(port, function(){
   console.log('listening on *:' + port);
 });
+
+function getConnectedUsers(){
+  return connectedUsers.map(user => Object({name : user.profile.name, tags : user.profile.tags, socketId : user.socketId}))
+}
