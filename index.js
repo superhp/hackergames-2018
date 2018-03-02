@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 1337;
+var connectedUsers = []
 
 io.origins(['https://learnfromme.azurewebsites.net:443']); 
 
@@ -21,6 +22,17 @@ io.on('connection', function(socket){
 
   socket.on('disconnect', function(){ 
     console.log("client id=" + socket.id + " disconnected"); 
+  });
+
+  socket.on('user list', function(){
+    var data = connectedUsers.map(user => Object({name : user.profile.name, socketId : user.socketId}))
+    io.emit('user list', data)
+  });
+
+  socket.on('login', function(profile){
+    connectedUsers.push({profile : profile, socketId : socket.id})
+    var data = connectedUsers.map(user => Object({name : user.profile.name, socketId : user.socketId}))
+    io.emit('user list', data)
   });
 });
 
