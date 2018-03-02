@@ -1,0 +1,14 @@
+{
+    "name": "hg-api",
+    "description": "HG API",
+    "version": "1.0.0",
+    "private": true,
+    "license": "",
+    "author": "",
+    "engines": {
+        "node": ">=6.9.1"
+    },
+    "scripts": {
+        "start": "node index.js"
+    }
+}
