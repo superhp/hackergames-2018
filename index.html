@@ -26,6 +26,7 @@
         var socket = io();
         $('form').submit(function(){
           socket.emit('chat message', $('#m').val());
+          socket.emit('private', 123, "labas");
           $('#m').val('');
           return false;
         });

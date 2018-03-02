@@ -1,6 +1,6 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http, { origins: '*:*'});
+var io = require('socket.io')(http, { origins: 'https://learnfromme.azurewebsites.net:80'});
 var port = process.env.PORT || 1337;
 var connectedUsers = []
 
@@ -13,8 +13,13 @@ io.on('connection', function(socket){
     io.emit('chat message', msg);
   });
 
-  socket.on('private', function(id, msg){ 
-    socket.broadcast.to(id).emit('private', msg); 
+  socket.on('private', function(receiverId, message){ 
+    console.log(receiverId + " " + message);
+    socket.broadcast.to(receiverId).emit('private', {senderId: socket.id, message: message}); 
+  });
+
+  socket.on('disconnect', function(){ 
+    console.log("client id=" + socket.id + " disconnected"); 
   });
 
   socket.on('user list', function(){
