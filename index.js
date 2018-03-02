@@ -16,6 +16,10 @@ io.on('connection', function(socket){
     console.log(receiverId + " " + message);
     socket.broadcast.to(receiverId).emit('private', {senderId: socket.id, message: message}); 
   });
+
+  socket.on('disconnect', function(){ 
+    console.log("client id=" + socket.id + " disconnected"); 
+  });
 });
 
 http.listen(port, function(){
