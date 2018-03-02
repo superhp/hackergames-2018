@@ -4,7 +4,7 @@ var io = require('socket.io')(http);
 var port = process.env.PORT || 1337;
 var connectedUsers = []
 
-io.origins(['https://learnfromme.azurewebsites.net:443']); 
+//io.origins(['https://learnfromme.azurewebsites.net:443']); 
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
