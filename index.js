@@ -32,10 +32,6 @@ io.on('connection', function(socket){
     var data = connectedUsers.map(user => Object({name : user.profile.name, socketId : user.socketId}))
     io.emit('user list', data)
   });
-
-  socket.on('disconnect', function(){
-    console.log('user disconnected');
-  });
 });
 
 http.listen(port, function(){
