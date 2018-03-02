@@ -1,13 +1,10 @@
-var http = require('http');
+var app = require('express')();
+var http = require('http').Server(app);
 
-var server = http.createServer(function(request, response) {
-
-    response.writeHead(200, {"Content-Type": "text/plain"});
-    response.end("API working with update!");
-
+app.get('/', function(req, res){
+  res.send('<h1>Hello world</h1>');
 });
 
-var port = process.env.PORT || 1337;
-server.listen(port);
-
-console.log("Server running at http://localhost:%d", port);
+http.listen(3000, function(){
+  console.log('listening on *:3000');
+});
