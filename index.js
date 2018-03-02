@@ -1,6 +1,6 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, { origins: '*:*'});
 var port = process.env.PORT || 3055;
 
 app.get('/', function(req, res){
