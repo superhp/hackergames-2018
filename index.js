@@ -11,6 +11,10 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg){
     io.emit('chat message', msg);
   });
+
+  socket.on('private', function(id, msg){ 
+    socket.broadcast.to(id).emit('private', msg); 
+  });
 });
 
 http.listen(port, function(){
