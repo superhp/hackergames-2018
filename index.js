@@ -66,6 +66,22 @@ io.on('connection', function(socket){
   socket.emit('user list', data);
 
   socket.on('chat message', function(msg){
+
+    con.connect(function(err) {        
+        con.query("SELECT * FROM Profiles", function (err, profiles) {
+            for(var profile in profiles) {
+                io.emit('chat message', profile.Name );
+                var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
+                con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+                    //allProfiles[id].tags = tags.map(x => x.Name); 
+                }); 
+                con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
+                    //allProfiles[id].ratings = ratings.map(x => x.Score); 
+                });
+            }
+        });
+    });
+
     io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " );
   });
 
