@@ -5,14 +5,12 @@ var mysql = require('mysql');
 
 var port = process.env.PORT || 1337; 
 
-var cs = process.env.MYSQLCONNSTR_localdb ? process.env.MYSQLCONNSTR_localdb.split(';') : null; 
-var con = process.env.MYSQLCONNSTR_localdb ? mysql.createConnection({
-    host: cs[1].substring(12).split(':')[0],
-    port: cs[1].substring(12).split(':')[1],
-    user: cs[2].substring(8),
-    password: cs[3].substring(9),
-    database: cs[0].substring(9)
-}) : null;
+var con = mysql.createConnection({
+    host: 'hg-db.mysql.database.azure.com',
+    user: 'hg@hg-db',
+    password: process.env.dbpass,
+    database: 'hg'
+});
 
 /*
   profile: {
@@ -23,21 +21,20 @@ var con = process.env.MYSQLCONNSTR_localdb ? mysql.createConnection({
 }
  */
 var allProfiles = []; 
-if(process.env.MYSQLCONNSTR_localdb) {
-    con.connect(function(err) {        
-        con.query("SELECT * FROM Profiles", function (err, profiles) {
-            profiles.forEach(profile => {
-                var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
-                con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                    allProfiles[id].tags = tags.map(x => x.Name); 
-                }); 
-                con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
-                    allProfiles[id].ratings = ratings.map(x => x.Score); 
-                });
-            })
-        });
+con.connect(function(err) {        
+    con.query("SELECT * FROM Profiles", function (err, profiles) {
+        profiles.forEach(profile => {
+            var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
+            con.query("SELECT Name FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+                allProfiles[id].tags = tags.map(x => x.Name); 
+                console.log(allProfiles[id].tags);
+            }); 
+            con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
+                allProfiles[id].ratings = ratings.map(x => x.Score); 
+            });
+        })
     });
-}
+});
 
 /*
 user {
@@ -66,9 +63,6 @@ io.on('connection', function(socket){
   socket.emit('user list', data);
 
   socket.on('chat message', function(msg){
-
-    
-
     io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " );
   });
 
