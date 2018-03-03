@@ -51,16 +51,19 @@ user {
  */
 var connectedUsers = []; 
 
-connectedUsers.push({profile:{name:'Tadas',tags:['cooking','developing'], rating: 7, ratingCount: 2},socketId:'fgsdgsrgs'});
-connectedUsers.push({profile:{name:'Mantas',tags:['cooking','treking'], rating: 16, ratingCount: 4},socketId:'ugiuog'});
-connectedUsers.push({profile:{name:'Jons',tags:['racing','treking'], rating: 12, ratingCount: 4},socketId:'uhoiugpoigp'});
-connectedUsers.push({profile:{name:'Karlassss',tags:[], rating: 20, ratingCount: 4},socketId:'uiogoiugpoiugupogupo'});
+connectedUsers.push({profile:{name:'Tadas',tags:[{name:'cooking', rating:5, ratingCount:1},{name:'developing', rating:4, ratingCount:2}]},socketId:'fgsdgsrgs'});
+connectedUsers.push({profile:{name:'Mantas',tags:[{name:'cooking', rating:3, ratingCount:2},{name:'treking', rating:10, ratingCount:2}]},socketId:'ugiuog'});
+connectedUsers.push({profile:{name:'Jons',tags:[{name:'racing',rating:16, ratingCount:4},{name:'treking', rating:16, ratingCount:6}]},socketId:'uhoiugpoigp'});
+connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');  
 });
 
 io.on('connection', function(socket){
+  var data = getConnectedUsers();
+  socket.emit('user list', data);
+
   socket.on('chat message', function(msg){
     io.emit('chat message', msg + socket.id);
   });
@@ -116,9 +119,15 @@ http.listen(port, function(){
 function getConnectedUsers(){  
     return connectedUsers.map(user => Object({
       name : user.profile.name, 
-      rating : getRating(user.profile), 
-      tags : user.profile.tags, 
+      tags : generateTags(user.profile.tags), 
       socketId : user.socketId}));
+}
+
+function generateTags(tags) {
+  return tags.map(tag => Object({
+    name: tag.name,
+    rating: precisionRound(tag.rating / tag.ratingCount, 2)
+  }));
 }
 
 function getRating(profile){
