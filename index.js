@@ -14,6 +14,10 @@ user {
  */
 var connectedUsers = []; 
 
+connectedUsers.push({profile:{name:'Tadas',tags:['cooking','developing']},socketId:'fgsdgsrgs'});
+connectedUsers.push({profile:{name:'Mantas',tags:['cooking','treking']},socketId:'ugiuog'});
+connectedUsers.push({profile:{name:'Jons',tags:['racing','treking']},socketId:'uhoiugpoigp'});
+connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
