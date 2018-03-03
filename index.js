@@ -8,7 +8,7 @@ var port = process.env.PORT || 1337;
 var con = mysql.createConnection({
     host: 'hg-db.mysql.database.azure.com',
     user: 'hg@hg-db',
-    password: process.env.dbpass,
+    password: 'Slaptazodis1',
     database: 'hg'
 });
 
@@ -16,8 +16,7 @@ var con = mysql.createConnection({
   profile: {
     name : string,
     email : string, 
-    tags : [],
-    ratings : [], 
+    tags : [ {name : string, ratings : []} ], 
     socketId : string  - if entered, the user is logged in  
   }
 }
@@ -26,17 +25,20 @@ var allProfiles = [];
 con.connect(function(err) {        
     con.query("SELECT * FROM Profiles", function (err, profiles) {
         profiles.forEach(profile => {
-            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], ratings: [], socketId: ""}) - 1; 
-            con.query("SELECT Name FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                allProfiles[id].tags = tags.map(x => x.Name); 
-                console.log(allProfiles[id].tags);
-            }); 
-            con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
-                allProfiles[id].ratings = ratings.map(x => x.Score); 
-            });
+            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], socketId: ""}) - 1; 
+            con.query("SELECT * FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+                allProfiles[id].tags = tags.map(x => Object({id: x.TagID, name: x.Name, ratings: []})); 
+                for(var i=0; i<allProfiles[id].tags.length; i++) { 
+                    con.query("SELECT Score FROM Ratings WHERE TagID = " + allProfiles[id].tags[i].id, function (err, ratings) {
+                        allProfiles[id].tags[i] = ratings.map(x => x.Score); 
+                    });
+                }
+            });             
         })
     });
 });
+
+
 
 /*
 user {
@@ -65,7 +67,7 @@ io.on('connection', function(socket){
   socket.emit('user list', data);
 
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " );
+    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " ); 
   });
 
   socket.on('private message', function(receiverId, message){ 
