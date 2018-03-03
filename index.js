@@ -46,7 +46,7 @@ io.on('connection', function(socket){
         if (err) io.emit('chat message', err.message);
         con.query("SELECT * FROM Profiles", function (err, result) {
             if (err) io.emit('chat message', err);
-          console.log(result);
+          console.log(result[0].name);
           io.emit('chat message', result);
         });
       });
