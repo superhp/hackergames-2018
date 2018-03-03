@@ -8,7 +8,7 @@ var port = process.env.PORT || 1337;
 var con = mysql.createConnection({
     host: 'hg-db.mysql.database.azure.com',
     user: 'hg@hg-db',
-    password: 'Slaptazodis1',
+    password: process.env.dbpass,
     database: 'hg'
 });
 
