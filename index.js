@@ -73,6 +73,8 @@ io.on('connection', function(socket){
   });
 
   socket.on('rate', function(rating){ 
+    // TODO update rating on both all users and db 
+
     console.log(rating.receiverId + " was rated " + rating.score);
     // calculate rating
     var receiver = connectedUsers.find(receiver => receiver.socketId === rating.receiverId)
@@ -97,6 +99,10 @@ io.on('connection', function(socket){
   });
 
   socket.on('login', function(profile){
+    // TODO. 1. check if the user is in allUsers. 
+    // if exists, just add loggedin attribute to the user 
+    // if not, create a new user, add it to both allUsers and db 
+
     connectedUsers.push({profile : profile, socketId : socket.id})
     var data = getConnectedUsers();
     io.emit('user list', data);
@@ -104,6 +110,8 @@ io.on('connection', function(socket){
 });
 
 function logout(socket) {
+  // TODO change user loggedin field to false in allUsers list 
+
   console.log(connectedUsers);
   console.log("client id=" + socket.id + " disconnected"); 
   connectedUsers = connectedUsers.filter(x => x.socketId !== socket.id); 
@@ -116,6 +124,8 @@ http.listen(port, function(){
 });
 
 function getConnectedUsers(){  
+    // TODO do a mapping from allProfiles where loggedin attribute in true 
+
     return connectedUsers.map(user => Object({
       name : user.profile.name, 
       tags : generateTags(user.profile.tags), 
