@@ -44,8 +44,8 @@ io.on('connection', function(socket){
 
     con.connect(function(err) {
         con.query("SELECT * FROM Profiles", function (err, result) {
-          console.log(result.count + " " + result[0].name);
-          io.emit('chat message', result);
+          console.log(result.count + " labas " + result[0].name);
+          io.emit('chat message', result.count + " labas " + result[0].name);
         });
       });
 
