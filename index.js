@@ -1,7 +1,16 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var port = process.env.PORT || 1337;
+var mysql = require('mysql'); 
+
+var port = process.env.PORT || 1337; 
+
+var con = mysql.createConnection({
+    host: "localhost",
+    user: "yourusername",
+    password: "yourpassword",
+    database: "localdb"
+  });
 
 /*
 user {
@@ -27,7 +36,7 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id);
+    io.emit('chat message', msg + socket.id + " " + process.env.MYSQLCONNSTR_localdb);
   });
 
   socket.on('private message', function(receiverId, message){ 
