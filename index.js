@@ -12,7 +12,31 @@ var con = mysql.createConnection({
     user: cs[2].substring(8),
     password: cs[3].substring(9),
     database: cs[0].substring(9)
+});
+
+/*
+  profile: {
+    name : string,
+    tags : [],
+    ratings : [] 
+  }
+}
+ */
+var allProfiles = []; 
+con.connect(function(err) {        
+  con.query("SELECT * FROM Profiles", function (err, profiles) {
+    for(var profile in profiles) {
+      var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
+      con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+        allProfiles[id].tags = tags; 
+      }); 
+      con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
+        allProfiles[id].ratings = ratings; 
+      });
+    }
+    io.emit('chat message', result.length + " labas " + result[0]);
   });
+});
 
 /*
 user {
@@ -38,17 +62,6 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
-
-    io.emit('chat message', cs[1].substring(12).split(':')[0] + " " + cs[1].substring(12).split(':')[1] + " " + cs[2].substring(8) + " " + cs[3].substring(9) + " " + cs[0].substring(9));
-    
-
-    con.connect(function(err) {
-        con.query("SELECT * FROM Profiles", function (err, result) {
-          console.log(result.count + " labas " + result[0].name);
-          io.emit('chat message', result.length + " labas " + result[0].Name);
-        });
-      });
-
     io.emit('chat message', msg + socket.id);
   });
 
