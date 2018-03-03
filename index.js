@@ -42,8 +42,8 @@ io.on('connection', function(socket){
     io.emit('chat message', cs[1].substring(12).split(':')[0] + " " + cs[1].substring(12).split(':')[1] + " " + cs[2].substring(8) + " " + cs[3].substring(9) + " " + cs[0].substring(9));
     
 
-    con.connect(function() {
-        con.query("SELECT * FROM Profiles", function (result) {
+    con.connect(function(err) {
+        con.query("SELECT * FROM Profiles", function (err, result) {
           console.log(result.count + " " + result[0].name);
           io.emit('chat message', result);
         });
