@@ -5,11 +5,12 @@ var mysql = require('mysql');
 
 var port = process.env.PORT || 1337; 
 
+var cs = process.env.MYSQLCONNSTR_localdb.split(';'); 
 var con = mysql.createConnection({
-    host: "localhost",
-    user: "yourusername",
-    password: "yourpassword",
-    database: "localdb"
+    host: aa[1].substring(12),
+    user: aa[2].substring(8),
+    password: aa[3].substring(9),
+    database: cs[0].substring(9)
   });
 
 /*
@@ -31,12 +32,22 @@ connectedUsers.push({profile:{name:'Jons',tags:['racing','treking'], rating: 12,
 connectedUsers.push({profile:{name:'Karlassss',tags:[], rating: 20, ratingCount: 4},socketId:'uiogoiugpoiugupogupo'});
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/index.html');  
 });
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id + " " + process.env.MYSQLCONNSTR_localdb);
+
+    con.connect(function(err) {
+        if (err) throw err;
+        con.query("SELECT * FROM Profiles", function (err, result) {
+          if (err) throw err;
+          console.log(result);
+          io.emit('chat message', result);
+        });
+      });
+
+    io.emit('chat message', msg + socket.id);
   });
 
   socket.on('private message', function(receiverId, message){ 
