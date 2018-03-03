@@ -5,14 +5,14 @@ var mysql = require('mysql');
 
 var port = process.env.PORT || 1337; 
 
-var cs = process.env.MYSQLCONNSTR_localdb.split(';'); 
-var con = mysql.createConnection({
+var cs = process.env.MYSQLCONNSTR_localdb ? process.env.MYSQLCONNSTR_localdb.split(';') : null; 
+var con = process.env.MYSQLCONNSTR_localdb ? mysql.createConnection({
     host: cs[1].substring(12).split(':')[0],
     port: cs[1].substring(12).split(':')[1],
     user: cs[2].substring(8),
     password: cs[3].substring(9),
     database: cs[0].substring(9)
-});
+}) : null;
 
 /*
   profile: {
@@ -23,20 +23,22 @@ var con = mysql.createConnection({
 }
  */
 var allProfiles = []; 
-con.connect(function(err) {        
-  con.query("SELECT * FROM Profiles", function (err, profiles) {
-    for(var profile in profiles) {
-      var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
-      con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-        allProfiles[id].tags = tags; 
-      }); 
-      con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
-        allProfiles[id].ratings = ratings; 
-      });
-    }
-    io.emit('chat message', result.length + " labas " + result[0]);
-  });
-});
+if(process.env.MYSQLCONNSTR_localdb) {
+    con.connect(function(err) {        
+        con.query("SELECT * FROM Profiles", function (err, profiles) {
+            for(var profile in profiles) {
+            var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
+            con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+                allProfiles[id].tags = tags; 
+            }); 
+            con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
+                allProfiles[id].ratings = ratings; 
+            });
+            }
+            io.emit('chat message', result.length + " labas " + result[0]);
+        });
+    });
+}
 
 /*
 user {
