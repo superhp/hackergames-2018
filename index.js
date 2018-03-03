@@ -69,7 +69,7 @@ io.on('connection', function(socket){
 
     con.connect(function(err) {        
         con.query("SELECT * FROM Profiles", function (err, profiles) {
-            for(var profile in profiles) {
+            profiles.forEach(profile => {
                 io.emit('chat message', profile.Name );
                 var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
                 con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
@@ -78,7 +78,7 @@ io.on('connection', function(socket){
                 con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
                     //allProfiles[id].ratings = ratings.map(x => x.Score); 
                 });
-            }
+            })
         });
     });
 
