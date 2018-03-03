@@ -17,7 +17,8 @@ var con = mysql.createConnection({
     name : string,
     email : string, 
     tags : [],
-    ratings : [] 
+    ratings : [], 
+    socketId : string  - if entered, the user is logged in  
   }
 }
  */
@@ -25,7 +26,7 @@ var allProfiles = [];
 con.connect(function(err) {        
     con.query("SELECT * FROM Profiles", function (err, profiles) {
         profiles.forEach(profile => {
-            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], ratings: []}) - 1; 
+            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], ratings: [], socketId: ""}) - 1; 
             con.query("SELECT Name FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
                 allProfiles[id].tags = tags.map(x => x.Name); 
                 console.log(allProfiles[id].tags);
@@ -100,9 +101,9 @@ io.on('connection', function(socket){
 
   socket.on('login', function(profile){
     // TODO. 1. check if the user is in allUsers. 
-    // if exists, just add loggedin attribute to the user 
+    // if exists, just add socketid attribute to the user 
     // if not, create a new user, add it to both allUsers and db 
-
+    
     connectedUsers.push({profile : profile, socketId : socket.id})
     var data = getConnectedUsers();
     io.emit('user list', data);
