@@ -25,7 +25,7 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+    io.emit('chat message', msg + socket.id);
   });
 
   socket.on('private message', function(receiverId, message){ 
@@ -41,10 +41,11 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function(){ 
-    console.log("client id=" + socket.id + " disconnected"); 
-    connectedUsers = connectedUsers.filter(x => x.socketId !== socket.id); 
-    var data = getConnectedUsers();
-    io.emit('user list', data);
+    logout(socket);
+  });
+
+  socket.on('logout', function(){ 
+    logout(socket);
   });
 
   socket.on('login', function(profile){
@@ -53,6 +54,14 @@ io.on('connection', function(socket){
     io.emit('user list', data);
   });
 });
+
+function logout(socket) {
+  console.log(connectedUsers);
+  console.log("client id=" + socket.id + " disconnected"); 
+  connectedUsers = connectedUsers.filter(x => x.socketId !== socket.id); 
+  var data = getConnectedUsers();
+  io.emit('user list', data);
+}
 
 http.listen(port, function(){
   console.log('listening on *:' + port);
