@@ -43,11 +43,6 @@ io.on('connection', function(socket){
     io.emit('user list', data);
   });
 
-  socket.on('user list', function(){
-    var data = getConnectedUsers();
-    io.emit('user list', data);
-  });
-
   socket.on('login', function(profile){
     connectedUsers.push({profile : profile, socketId : socket.id})
     var data = getConnectedUsers();
