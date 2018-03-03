@@ -29,10 +29,10 @@ if(process.env.MYSQLCONNSTR_localdb) {
             for(var profile in profiles) {
                 var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
                 con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                    allProfiles[id].tags = tags; 
+                    allProfiles[id].tags = tags.map(x => x.Name); 
                 }); 
                 con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
-                    allProfiles[id].ratings = ratings; 
+                    allProfiles[id].ratings = ratings.map(x => x.Score); 
                 });
             }
         });
@@ -66,7 +66,7 @@ io.on('connection', function(socket){
   socket.emit('user list', data);
 
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id + " " + allProfiles[0].Name);
+    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " + allProfiles[0].tags[0]);
   });
 
   socket.on('private message', function(receiverId, message){ 
