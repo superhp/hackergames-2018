@@ -39,7 +39,7 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg){
 
     con.connect(function(err) {
-        if (err) io.emit('chat message', err);
+        if (err) io.emit('chat message', err.message);
         con.query("SELECT * FROM Profiles", function (err, result) {
             if (err) io.emit('chat message', err);
           console.log(result);
