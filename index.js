@@ -7,9 +7,9 @@ var port = process.env.PORT || 1337;
 
 var cs = process.env.MYSQLCONNSTR_localdb.split(';'); 
 var con = mysql.createConnection({
-    host: aa[1].substring(12),
-    user: aa[2].substring(8),
-    password: aa[3].substring(9),
+    host: cs[1].substring(12),
+    user: cs[2].substring(8),
+    password: cs[3].substring(9),
     database: cs[0].substring(9)
   });
 
