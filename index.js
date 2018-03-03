@@ -24,25 +24,34 @@ io.on('connection', function(socket){
     io.emit('chat message', msg);
   });
 
-  socket.on('private', function(receiverId, message){ 
+  socket.on('private message', function(receiverId, message){ 
     console.log(receiverId + " " + message);
-    socket.broadcast.to(receiverId).emit('private', {senderId: socket.id, message: message}); 
+    io.broadcast.to(receiverId).emit('private message', {senderId: socket.id, message: message}); 
+  });
+
+  socket.on('rate', function(rating){ 
+    console.log(rating.receiverId + " was rated " + rating.score);
+    // calculate rating  
+    var data = getConnectedUsers();
+    io.emit('user list', data);
   });
 
   socket.on('disconnect', function(){ 
     console.log("client id=" + socket.id + " disconnected"); 
     connectedUsers = connectedUsers.filter(x => x.socketId !== socket.id); 
+    var data = getConnectedUsers();
+    io.emit('user list', data);
   });
 
   socket.on('user list', function(){
-    var data = getConnectedUsers()
-    io.emit('user list', data)
+    var data = getConnectedUsers();
+    io.emit('user list', data);
   });
 
   socket.on('login', function(profile){
     connectedUsers.push({profile : profile, socketId : socket.id})
-    var data = getConnectedUsers()
-    io.emit('user list', data)
+    var data = getConnectedUsers();
+    io.emit('user list', data);
   });
 });
 
