@@ -16,10 +16,10 @@ user {
  */
 var connectedUsers = []; 
 
-connectedUsers.push({profile:{name:'Tadas',tags:['cooking','developing']},socketId:'fgsdgsrgs'});
-connectedUsers.push({profile:{name:'Mantas',tags:['cooking','treking']},socketId:'ugiuog'});
-connectedUsers.push({profile:{name:'Jons',tags:['racing','treking']},socketId:'uhoiugpoigp'});
-connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
+connectedUsers.push({profile:{name:'Tadas',tags:['cooking','developing']},socketId:'fgsdgsrgs', rating: 7});
+connectedUsers.push({profile:{name:'Mantas',tags:['cooking','treking']},socketId:'ugiuog', rating: 16});
+connectedUsers.push({profile:{name:'Jons',tags:['racing','treking']},socketId:'uhoiugpoigp', rating: 12});
+connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo', rating: 20});
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
