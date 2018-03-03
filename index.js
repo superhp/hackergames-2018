@@ -78,19 +78,19 @@ http.listen(port, function(){
   console.log('listening on *:' + port);
 });
 
-function getConnectedUsers(){
-  if(receiver.profile.rating && receiver.profile.ratingCount) 
+function getConnectedUsers(){  
     return connectedUsers.map(user => Object({
       name : user.profile.name, 
-      rating : precisionRound(rating / ratingCount, 2), 
+      rating : getRating(user.profile), 
       tags : user.profile.tags, 
       socketId : user.socketId}));
-  else
-    return connectedUsers.map(user => Object({
-      name : user.profile.name, 
-      rating : 0, 
-      tags : user.profile.tags, 
-      socketId : user.socketId}));
+}
+
+function getRating(profile){
+    if(profile.rating && profile.ratingCount)
+      return precisionRound(profile.rating / profile.ratingCount, 2);
+    else
+      return 0;
 }
 
 function precisionRound(number, precision) {
