@@ -8,7 +8,7 @@ var port = process.env.PORT || 1337;
 var con = mysql.createConnection({
     host: 'hg-db.mysql.database.azure.com',
     user: 'hg@hg-db',
-    password: process.env.dbpass,
+    password: 'Slaptazodis1',
     database: 'hg'
 });
 
@@ -48,12 +48,18 @@ user {
   sockedId : string
 }
  */
+
+
 var connectedUsers = []; 
+var requestMessages = [];
 
 connectedUsers.push({profile:{name:'Tadas',tags:[{name:'cooking', rating:5, ratingCount:1},{name:'developing', rating:4, ratingCount:2}]},socketId:'fgsdgsrgs'});
 connectedUsers.push({profile:{name:'Mantas',tags:[{name:'cooking', rating:3, ratingCount:2},{name:'treking', rating:10, ratingCount:2}]},socketId:'ugiuog'});
 connectedUsers.push({profile:{name:'Jons',tags:[{name:'racing',rating:16, ratingCount:4},{name:'treking', rating:16, ratingCount:6}]},socketId:'uhoiugpoigp'});
 connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
+
+requestMessages.push({userId: 'fgsdgsrgs', requestMessages: [{socketId: '123', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
+requestMessages.push({userId: 'ugiuog', requestMessages: [{socketId: '345', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');  
@@ -107,6 +113,20 @@ io.on('connection', function(socket){
     var data = getConnectedUsers();
     io.emit('user list', data);
   });
+
+  socket.on('send request message', function(mentorSocketId, requesterSocketId, reqMessage) {
+    //TODO: add reqMessage to DB
+    //message should not be a duplicate
+    var selectedMentor;
+    selectedMentor = requestMessages.find(x => x.userId === mentorSocketId);
+    if (!selectedMentor) {
+        selectedMentor = {userId: mentorSocketId, requestMessages: []};
+        requestMessages.push(selectedMentor);
+    }
+    selectedMentor.requestMessages.push({socketId: requesterSocketId, message: reqMessage});
+
+    socket.broadcast.to(mentorSocketId).emit('request messages', selectedMentor.requestMessages);
+  })
 });
 
 function logout(socket) {
