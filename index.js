@@ -27,12 +27,16 @@ con.connect(function(err) {
         profiles.forEach(profile => {
             var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], socketId: ""}) - 1; 
             con.query("SELECT * FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                allProfiles[id].tags = tags.map(x => Object({id: x.TagID, name: x.Name, ratings: []})); 
-                for(var i=0; i<allProfiles[id].tags.length; i++) { 
-                    con.query("SELECT Score FROM Ratings WHERE TagID = " + allProfiles[id].tags[i].id, function (err, ratings) {
-                        allProfiles[id].tags[i] = ratings.map(x => x.Score); 
-                    });
-                }
+                allProfiles[id].tags = tags.length ? tags.map(x => Object({id: x.TagID, name: x.Name, ratings: []})) : []; 
+                allProfiles[id].tags.forEach(tag => {   
+                    
+                        con.query("SELECT Score FROM Ratings WHERE TagID = " + tag.id, function (err, ratings) {
+                            tag.ratings = ratings.length ? ratings.map(x => x.Score) : []; 
+                            
+                        });
+                      
+                });
+                
             });             
         })
     });
@@ -72,8 +76,9 @@ io.on('connection', function(socket){
   var data = getConnectedUsers();
   socket.emit('user list', data);
 
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " ); 
+  socket.on('chat message', function(msg){    
+    var t = getConnectedUsers();
+    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " + t ); 
   });
 
   socket.on('private message', function(receiverId, message){ 
@@ -153,17 +158,18 @@ http.listen(port, function(){
 function getConnectedUsers(){  
     // TODO do a mapping from allProfiles where loggedin attribute in true 
 
-    return connectedUsers.map(user => Object({
-      name : user.profile.name, 
-      tags : generateTags(user.profile.tags), 
-      socketId : user.socketId}));
+    return allProfiles.filter(x => x.socketId === "")
+                      .map(profile => Object({
+                            name: profile.name, 
+                            email: profile.email, 
+                            tags : generateTags(profile.tags), 
+                            socketId : profile.socketId}));
 }
 
-function generateTags(tags) {
-  return tags.map(tag => Object({
-    name: tag.name,
-    rating: precisionRound(tag.rating / tag.ratingCount, 2)
-  }));
+function generateTags(tags) {   
+    tags = tags.map(x => Object({name: x.name, rating: x.ratings.length ? precisionRound(x.ratings.reduce((a, b) => a + b, 0) / x.ratings.length, 2) : 0}));
+    console.log(tags);;
+    return tags; 
 }
 
 function getRating(profile){
