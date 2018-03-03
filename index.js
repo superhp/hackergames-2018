@@ -66,7 +66,7 @@ io.on('connection', function(socket){
   socket.emit('user list', data);
 
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " + allProfiles[0].tags[0]);
+    io.emit('chat message', msg + socket.id + " " + allProfiles[0].name + " " );
   });
 
   socket.on('private message', function(receiverId, message){ 
