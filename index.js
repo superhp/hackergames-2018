@@ -7,7 +7,9 @@ var port = process.env.PORT || 1337;
 user {
   profile: {
     name : string,
-    tags : []
+    tags : [],
+    rating : int,
+    ratingCount : int,
   },
   sockedId : string
 }
@@ -31,7 +33,16 @@ io.on('connection', function(socket){
 
   socket.on('rate', function(rating){ 
     console.log(rating.receiverId + " was rated " + rating.score);
-    // calculate rating  
+    // calculate rating
+    var receiver = connectedUsers.find(receiver => receiver.socketId === rating.receiverId)
+    if(receiver.profile.rating && receiver.profile.ratingCount) {
+      receiver.profile.rating += rating.score;
+      receiver.profile.ratingCount++;
+    }
+    else{
+      receiver.profile.rating = rating.score;
+      receiver.profile.ratingCount = 1;  
+    }
     var data = getConnectedUsers();
     io.emit('user list', data);
   });
@@ -55,5 +66,14 @@ http.listen(port, function(){
 });
 
 function getConnectedUsers(){
-  return connectedUsers.map(user => Object({name : user.profile.name, tags : user.profile.tags, socketId : user.socketId}))
+  return connectedUsers.map(user => Object({
+    name : user.profile.name, 
+    rating : precisionRound(rating / ratingCount, 2), 
+    tags : user.profile.tags, 
+    socketId : user.socketId}));
+}
+
+function precisionRound(number, precision) {
+  var factor = Math.pow(10, precision);
+  return Math.round(number * factor) / factor;
 }
