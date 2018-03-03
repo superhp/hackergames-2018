@@ -7,7 +7,8 @@ var port = process.env.PORT || 1337;
 
 var cs = process.env.MYSQLCONNSTR_localdb.split(';'); 
 var con = mysql.createConnection({
-    host: cs[1].substring(12),
+    host: cs[1].substring(12).split(':')[0],
+    port: cs[1].substring(12).split(':')[1],
     user: cs[2].substring(8),
     password: cs[3].substring(9),
     database: cs[0].substring(9)
@@ -38,7 +39,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
 
-    io.emit('chat message', cs[1].substring(12) + " " + cs[2].substring(8) + " " + cs[3].substring(9) + " " + cs[0].substring(9));
+    io.emit('chat message', cs[1].substring(12).split(':')[0] + " " + cs[1].substring(12).split(':')[1] + " " + cs[2].substring(8) + " " + cs[3].substring(9) + " " + cs[0].substring(9));
     
 
     con.connect(function(err) {
