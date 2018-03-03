@@ -130,6 +130,10 @@ io.on('connection', function(socket){
 
     socket.broadcast.to(mentorSocketId).emit('request messages', selectedMentor.requestMessages);
   })
+
+  socket.on('notify accept', function(requesterSocketId, mentorSocketId){
+    socket.broadcast.to(requesterSocketId).emit('notify accept', mentorSocketId);
+  })
 });
 
 function logout(socket) {
