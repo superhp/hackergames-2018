@@ -15,6 +15,7 @@ var con = mysql.createConnection({
 /*
   profile: {
     name : string,
+    email : string, 
     tags : [],
     ratings : [] 
   }
@@ -24,7 +25,7 @@ var allProfiles = [];
 con.connect(function(err) {        
     con.query("SELECT * FROM Profiles", function (err, profiles) {
         profiles.forEach(profile => {
-            var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
+            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], ratings: []}) - 1; 
             con.query("SELECT Name FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
                 allProfiles[id].tags = tags.map(x => x.Name); 
                 console.log(allProfiles[id].tags);
