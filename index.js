@@ -79,11 +79,18 @@ http.listen(port, function(){
 });
 
 function getConnectedUsers(){
-  return connectedUsers.map(user => Object({
-    name : user.profile.name, 
-    rating : precisionRound(rating / ratingCount, 2), 
-    tags : user.profile.tags, 
-    socketId : user.socketId}));
+  if(receiver.profile.rating && receiver.profile.ratingCount) 
+    return connectedUsers.map(user => Object({
+      name : user.profile.name, 
+      rating : precisionRound(rating / ratingCount, 2), 
+      tags : user.profile.tags, 
+      socketId : user.socketId}));
+  else
+    return connectedUsers.map(user => Object({
+      name : user.profile.name, 
+      rating : 0, 
+      tags : user.profile.tags, 
+      socketId : user.socketId}));
 }
 
 function precisionRound(number, precision) {
