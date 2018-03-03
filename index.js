@@ -29,10 +29,10 @@ if(process.env.MYSQLCONNSTR_localdb) {
             profiles.forEach(profile => {
                 var id = allProfiles.push({name: profile.Name, tags: [], ratings: []}) - 1; 
                 con.query("SELECT Tag FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                    //allProfiles[id].tags = tags.map(x => x.Name); 
+                    allProfiles[id].tags = tags.map(x => x.Name); 
                 }); 
                 con.query("SELECT Score FROM Ratings WHERE ProfileID = " + profile.ProfileID, function (err, ratings) {
-                    //allProfiles[id].ratings = ratings.map(x => x.Score); 
+                    allProfiles[id].ratings = ratings.map(x => x.Score); 
                 });
             })
         });
