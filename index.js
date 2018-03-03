@@ -38,6 +38,9 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
   socket.on('chat message', function(msg){
 
+    io.emit('chat message', cs[1].substring(12) + " " + cs[2].substring(8) + " " + cs[3].substring(9) + " " + cs[0].substring(9));
+    
+
     con.connect(function(err) {
         if (err) io.emit('chat message', err.message);
         con.query("SELECT * FROM Profiles", function (err, result) {
