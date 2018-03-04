@@ -21,28 +21,26 @@ var con = mysql.createConnection({
   }
 }
  */
-var allProfiles = []; 
-con.connect(function(err) {        
-    con.query("SELECT * FROM Profiles", function (err, profiles) {
-        profiles.forEach(profile => {
-            var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], socketId: ""}) - 1; 
-            con.query("SELECT * FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
-                allProfiles[id].tags = tags.length ? tags.map(x => Object({id: x.TagID, name: x.Name, ratings: []})) : []; 
-                allProfiles[id].tags.forEach(tag => {   
+// var allProfiles = []; 
+// con.connect(function(err) {        
+//     con.query("SELECT * FROM Profiles", function (err, profiles) {
+//         profiles.forEach(profile => {
+//             var id = allProfiles.push({name: profile.Name, email: profile.Email, tags: [], socketId: ""}) - 1; 
+//             con.query("SELECT * FROM Tags WHERE ProfileID = " + profile.ProfileID, function (err, tags) {
+//                 allProfiles[id].tags = tags.length ? tags.map(x => Object({id: x.TagID, name: x.Name, ratings: []})) : []; 
+//                 allProfiles[id].tags.forEach(tag => {   
                     
-                        con.query("SELECT Score FROM Ratings WHERE TagID = " + tag.id, function (err, ratings) {
-                            tag.ratings = ratings.length ? ratings.map(x => x.Score) : []; 
+//                         con.query("SELECT Score FROM Ratings WHERE TagID = " + tag.id, function (err, ratings) {
+//                             tag.ratings = ratings.length ? ratings.map(x => x.Score) : []; 
                             
-                        });
+//                         });
                       
-                });
+//                 });
                 
-            });             
-        })
-    });
-});
-
-
+//             });             
+//         })
+//     });
+// });
 
 /*
 user {
@@ -56,14 +54,14 @@ user {
 }
  */
 
-
+var allProfiles = [];
 var connectedUsers = []; 
 var requestMessages = [];
 
-connectedUsers.push({profile:{name:'Tadas',tags:[{name:'cooking', rating:5, ratingCount:1},{name:'developing', rating:4, ratingCount:2}]},socketId:'fgsdgsrgs'});
-connectedUsers.push({profile:{name:'Mantas',tags:[{name:'cooking', rating:3, ratingCount:2},{name:'treking', rating:10, ratingCount:2}]},socketId:'ugiuog'});
-connectedUsers.push({profile:{name:'Jons',tags:[{name:'racing',rating:16, ratingCount:4},{name:'treking', rating:16, ratingCount:6}]},socketId:'uhoiugpoigp'});
-connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
+// connectedUsers.push({profile:{name:'Tadas',tags:[{name:'cooking', rating:5, ratingCount:1},{name:'developing', rating:4, ratingCount:2}]},socketId:'fgsdgsrgs'});
+// connectedUsers.push({profile:{name:'Mantas',tags:[{name:'cooking', rating:3, ratingCount:2},{name:'treking', rating:10, ratingCount:2}]},socketId:'ugiuog'});
+// connectedUsers.push({profile:{name:'Jons',tags:[{name:'racing',rating:16, ratingCount:4},{name:'treking', rating:16, ratingCount:6}]},socketId:'uhoiugpoigp'});
+// connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
 
 requestMessages.push({userId: 'fgsdgsrgs', requestMessages: [{socketId: '123', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
 requestMessages.push({userId: 'ugiuog', requestMessages: [{socketId: '345', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
@@ -118,6 +116,8 @@ io.on('connection', function(socket){
     // if not, create a new user, add it to both allUsers and db 
     
     connectedUsers.push({profile : profile, socketId : socket.id})
+    console.log('User logged in. Profile:')
+    console.log(profile);
     var data = getConnectedUsers();
     io.emit('user list', data);
   });
@@ -158,12 +158,13 @@ http.listen(port, function(){
 function getConnectedUsers(){  
     // TODO do a mapping from allProfiles where loggedin attribute in true 
 
-    return allProfiles.filter(x => x.socketId === "")
-                      .map(profile => Object({
-                            name: profile.name, 
-                            email: profile.email, 
-                            tags : generateTags(profile.tags), 
-                            socketId : profile.socketId}));
+    // return allProfiles.filter(x => x.socketId === "")
+    //                   .map(profile => Object({
+    //                         name: profile.name, 
+    //                         email: profile.email, 
+    //                         tags : generateTags(profile.tags), 
+    //                         socketId : profile.socketId}));
+    return connectedUsers;
 }
 
 function generateTags(tags) {   
