@@ -55,6 +55,7 @@ user {
  */
 
 var allProfiles = [];
+
 var connectedUsers = []; 
 var requestMessages = [];
 
@@ -89,15 +90,28 @@ io.on('connection', function(socket){
 
     console.log(rating.receiverId + " was rated " + rating.score);
     // calculate rating
-    var receiver = connectedUsers.find(receiver => receiver.socketId === rating.receiverId)
-    if(receiver.profile.rating && receiver.profile.ratingCount) {
-      receiver.profile.rating += rating.score;
-      receiver.profile.ratingCount++;
+    console.log(connectedUsers);
+    var receiver = connectedUsers.find(receiver => receiver.socketId === rating.receiverId);
+
+    for (var key in rating.score) {
+      console.log(key);
+      var tag = receiver.profile.tags.find(t => t.name === key);
+      if (tag !== undefined) {
+        tag.rating += rating.score[key];
+        tag.ratingCount++;
+      }
+
+      console.log(tag);
     }
-    else{
-      receiver.profile.rating = rating.score;
-      receiver.profile.ratingCount = 1;  
-    }
+
+    // if(receiver.profile.rating && receiver.profile.ratingCount) {
+    //   receiver.profile.rating += rating.score;
+    //   receiver.profile.ratingCount++;
+    // }
+    // else{
+    //   receiver.profile.rating = rating.score;
+    //   receiver.profile.ratingCount = 1;  
+    // }
     var data = getConnectedUsers();
     io.emit('user list', data);
   });
@@ -122,7 +136,9 @@ io.on('connection', function(socket){
     io.emit('user list', data);
   });
 
+  
   socket.on('send request message', function(mentorSocketId, requesterSocketId, reqMessage, topic) {
+
     //TODO: add reqMessage to DB
     //message should not be a duplicate
     var selectedMentor;
