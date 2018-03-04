@@ -63,8 +63,8 @@ var requestMessages = [];
 // connectedUsers.push({profile:{name:'Jons',tags:[{name:'racing',rating:16, ratingCount:4},{name:'treking', rating:16, ratingCount:6}]},socketId:'uhoiugpoigp'});
 // connectedUsers.push({profile:{name:'Karlassss',tags:[]},socketId:'uiogoiugpoiugupogupo'});
 
-requestMessages.push({userId: 'fgsdgsrgs', requestMessages: [{socketId: '123', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
-requestMessages.push({userId: 'ugiuog', requestMessages: [{socketId: '345', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
+// requestMessages.push({userId: 'fgsdgsrgs', requestMessages: [{socketId: '123', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
+// requestMessages.push({userId: 'ugiuog', requestMessages: [{socketId: '345', message: 'Please talk to me'}, {socketId: 'heyheyho', message: 'I want to talk to you'}]})
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');  
@@ -81,7 +81,7 @@ io.on('connection', function(socket){
 
   socket.on('private message', function(receiverId, message){ 
     console.log(receiverId + " " + message);
-    io.broadcast.to(receiverId).emit('private message', {senderId: socket.id, message: message}); 
+    socket.broadcast.to(receiverId).emit('private message', {senderId: socket.id, message: message}); 
   });
 
   socket.on('rate', function(rating){ 
@@ -122,7 +122,7 @@ io.on('connection', function(socket){
     io.emit('user list', data);
   });
 
-  socket.on('send request message', function(mentorSocketId, requesterSocketId, reqMessage) {
+  socket.on('send request message', function(mentorSocketId, requesterSocketId, reqMessage, topic) {
     //TODO: add reqMessage to DB
     //message should not be a duplicate
     var selectedMentor;
@@ -131,7 +131,12 @@ io.on('connection', function(socket){
         selectedMentor = {userId: mentorSocketId, requestMessages: []};
         requestMessages.push(selectedMentor);
     }
-    selectedMentor.requestMessages.push({socketId: requesterSocketId, message: reqMessage});
+    selectedMentor.requestMessages.push({
+        socketId: requesterSocketId, 
+        message: reqMessage,
+        userName: getUserNameBySocketId(requesterSocketId),
+        topic: topic
+    });
 
     socket.broadcast.to(mentorSocketId).emit('request messages', selectedMentor.requestMessages);
   })
@@ -183,4 +188,9 @@ function getRating(profile){
 function precisionRound(number, precision) {
   var factor = Math.pow(10, precision);
   return Math.round(number * factor) / factor;
+}
+
+function getUserNameBySocketId(socketId) {
+    var user = connectedUsers.find(x => x.socketId === socketId);
+    return user.profile.name;
 }
