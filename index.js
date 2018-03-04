@@ -131,14 +131,21 @@ io.on('connection', function(socket){
         selectedMentor = {userId: mentorSocketId, requestMessages: []};
         requestMessages.push(selectedMentor);
     }
-    selectedMentor.requestMessages.push({
+    selectedMentor.requestMessages.unshift({
         socketId: requesterSocketId, 
         message: reqMessage,
         userName: getUserNameBySocketId(requesterSocketId),
         topic: topic
     });
-
     socket.broadcast.to(mentorSocketId).emit('request messages', selectedMentor.requestMessages);
+  })
+
+  socket.on('reject message', function(mentorSocketId, requesterSocketId) {
+    console.log(requestMessages);
+    var mentor = requestMessages.find(x => x.userId === mentorSocketId);
+    var rejectedMessageIndex = mentor.requestMessages.findIndex(x => x.socketId === requesterSocketId);
+    mentor.requestMessages.splice(rejectedMessageIndex, 1);
+    socket.emit('request messages', mentor.requestMessages);
   })
 
   socket.on('notify accept', function(requesterSocketId, mentorSocketId){
